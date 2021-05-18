@@ -190,7 +190,7 @@ func (r *Eureka) uploadHeartPacket(){
 		return
 	}
 	if response.StatusCode==404 {
-		logrus.Error("eureka heartbeat status 404")
+		logrus.Error("eureka heartbeat status 404,response error is "+response.Error.Error())
 		return
 	}
     if response.StatusCode !=200{

@@ -41,6 +41,7 @@ func GinLogger() gin.HandlerFunc {
 		}
 
 		fields := logrus.Fields{
+			"traceId": reqID,
 			"upSpan":   upspan,
 			"spanId":  spanId,
 			"rt":       0,
@@ -68,12 +69,4 @@ func GinLogger() gin.HandlerFunc {
 //we can change the traceId func
 func genTraceId() string{
 	return  uuid.New().String()
-}
-
-func T() gin.HandlerFunc{
-	return func(c *gin.Context){
-		logrus.Info("test1")
-		c.Next()
-		logrus.Info("test2")
-	}
 }

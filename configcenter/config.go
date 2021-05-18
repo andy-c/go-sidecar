@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	PullTimeout = 4000 // for connect ,request
+	PullTimeout = 6000 // for connect ,request
 	HoldTimeout = 65000 //for long pull timeout
 	TickTimeout = 9000 //for timer goroutine
 )
