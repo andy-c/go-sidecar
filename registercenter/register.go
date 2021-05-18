@@ -413,6 +413,12 @@ func (r *Eureka) pullProxyApps(){
 		Context: r.ctx,
 		Headers: r.buildHttpHeader(),
 	})
+	//fix memory leak
+	defer func() {
+		if allapps!=nil {
+			allapps.Close()
+		}
+	}()
 	if err !=nil {
 		logrus.Error("eureka pull apps failed ,error is "+err.Error())
 		return
