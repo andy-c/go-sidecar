@@ -470,6 +470,7 @@ func (r *Eureka) buildHttpHeader() map[string]string{
 	defaultHeader:=make(map[string]string)
 	defaultHeader["Accept"] = "application/json"
 	defaultHeader["Content-Type'"] = "application/json"
+	defaultHeader["User-Agent"] = config.Config.Eureka.AppName
 	return defaultHeader
 }
 
