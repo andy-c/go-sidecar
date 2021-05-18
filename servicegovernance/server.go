@@ -24,6 +24,10 @@ var Singleton *Server
 var once sync.Once
 var WaitGroup sync.WaitGroup
 
+const (
+	VERSION = 0.1
+)
+
 type Server struct {
 	Ctx context.Context
 	Cancel context.CancelFunc
