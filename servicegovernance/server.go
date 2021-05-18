@@ -31,7 +31,7 @@ type Server struct {
 
 //Start Application
 func (s *Server) Run(){
-	//init config from env for config center
+	//init config from env
 	if err:=env.Parse(&config.Config);err!=nil{
 		panic("error : parse env failed,reason is "+err.Error())
 	}
@@ -77,9 +77,5 @@ func New() *Server{
 			Cancel: cancel,
 		}
 	})
-	return Singleton
-}
-
-func getInstance() *Server{
 	return Singleton
 }
