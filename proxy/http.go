@@ -8,6 +8,7 @@ package proxy
 
 import (
 	"fmt"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"go-sidecar/config"
 	"go-sidecar/proxy/controller"
@@ -23,6 +24,7 @@ type Proxy struct{
 
 func NewProxy() *Proxy{
 	router:=gin.New()
+	pprof.Register(router)
 	proxy:=&Proxy{
 		Host:config.Config.Server.Host,
 		Port:config.Config.Server.Port,
