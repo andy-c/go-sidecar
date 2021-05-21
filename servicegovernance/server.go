@@ -46,7 +46,12 @@ func (s *Server) Run(){
 	//start config center
 	configcenter.NewApollo(s.Ctx)
 	//start register center
-	registercenter.NewEureka(s.Ctx)
+	if config.Config.IsConsulOrEureka == "consul"{
+		registercenter.NewConsul(s.Ctx)
+	}else {
+		registercenter.NewEureka(s.Ctx)
+	}
+
 }
 
 //handle signal

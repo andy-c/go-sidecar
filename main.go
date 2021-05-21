@@ -12,10 +12,9 @@ import (
 )
 
 func main(){
-    //service governance
+    //service start
     serviceComponent:= servicegovernance.New()
     serviceComponent.Run()
-
     //proxy start
     proxy:=proxy2.NewProxy()
     proxy.Run()

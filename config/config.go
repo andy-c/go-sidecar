@@ -14,6 +14,8 @@ var Config=Configure{
 	Log:&LogConfig{},
 	Eureka:&EurekaConfig{},
 	Server:&ServerConfig{},
+	Consul: &ConsulConfig{},
+	IsConsulOrEureka:"consul",
 }
 
 type Configure struct {
@@ -21,9 +23,11 @@ type Configure struct {
 	Log *LogConfig
 	Eureka *EurekaConfig
 	Server *ServerConfig
+	Consul *ConsulConfig
+	IsConsulOrEureka string `env:'REGISTER_CENTER_TYPE' envDefault:"eureka"`
 }
 type ApolloConfig struct {
-	Host string `env:"APOLLO_HOST" envDefault:"http://configcenter.com"`
+	Host string `env:"APOLLO_HOST" envDefault:"http://apollo.com"`
 	Port string `env:"APOLLO_PORT" envDefault:"8080"`
 	ClusterName string `env:"APOLLO_CLUSTER_NAME" envDefault:"default"`
 	Notifications string `env:"APOLLO_NOTIFICATIONS" envDefault:"eureka,log"`
@@ -38,7 +42,7 @@ type LogConfig struct {
 }
 
 type EurekaConfig struct{
-   AppName string `env:"APP_NAME" envDefault:"go-sidecar-v1"`
+   AppName string `env:"APP_NAME" envDefault:"swoole-sidecar-v1"`
    HostName string `env:"HOST_NAME" envDefault:"127.0.0.1"`
    AppAddr string `env:"APP_ADDR" envDefault:"127.0.0.1"`
    AppPort string `env:"APP_PORT" envDefault:"8089"`
@@ -48,10 +52,18 @@ type EurekaConfig struct{
    HealthCheckUri string `env:"HEALTH_CHECK_URI" envDefault:"health"`
    VipAddr string `env:"VIP_ADDR" envDefault:"127.0.0.1"`
    SecureVipAddr string `env:"SECURE_VIP_ADDR" envDefault:"127.0.0.1"`
-   EurekServerAddr string `env:"EUREKA_SERVER_ADDR" envDefault:"http://registercenter.com"`
+   EurekaServerAddr string `env:"EUREKA_SERVER_ADDR" envDefault:"http://eureka.com"`
 }
 
 type ServerConfig struct {
    Host string `env:"SERVER_HOST" envDefault:"0.0.0.0"`
    Port uint16 `env:"SERVER_PORT" envDefault:"8089"`
+}
+
+type ConsulConfig struct{
+	AppName string `env:"APP_NAME" envDefault:"GO-SIDECAR-V3"`
+	HostName string `env:"HOST_NAME" envDefault:"127.0.0.1"`
+	AppAddr string `env:"APP_ADDR" envDefault:"127.0.0.1"`
+	AppPort string `env:"APP_PORT" envDefault:"8089"`
+	HealthCheckUri string `env:"HEALTH_CHECK_URI" envDefault:"health"`
 }

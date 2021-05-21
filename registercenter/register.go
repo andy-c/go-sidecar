@@ -9,10 +9,13 @@ package registercenter
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	consulapi "github.com/hashicorp/consul/api"
 	"github.com/levigross/grequests"
 	"github.com/sirupsen/logrus"
 	"go-sidecar/config"
 	"math/rand"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,6 +27,8 @@ const (
 	EurekaApiPrefix="/eureka/apps/"
 	HeartbeatTimeout=10000
 	PullAppTimeout=5000
+	ConsulApiPrefix="/v1/agent/service/"
+	ConsulHost="http://127.0.0.1:8500"
 )
 
 type RegisterCenter interface {
@@ -35,6 +40,7 @@ type RegisterCenter interface {
 
 var Singleton *Eureka
 var allApps = &Applications{}
+var ConsulSingleton *Consul
 
 type Eureka struct{
 	ctx context.Context
@@ -42,10 +48,6 @@ type Eureka struct{
 	wait sync.WaitGroup
 	mu sync.RWMutex
 	instance *Instance
-}
-
-type Consul struct{
-	ctx context.Context
 }
 
 func NewEureka(mainCtx context.Context){
@@ -518,3 +520,82 @@ func (r *Eureka) Random(sname string) *Instance {
 func (r *Eureka) GetInstances() []Application{
 	return allApps.Application
 }
+
+
+type Consul struct{
+	consulAgent *consulapi.Client
+	ctx context.Context
+}
+
+func NewConsul(mainCtx context.Context){
+	ConsulSingleton=&Consul{
+		ctx:mainCtx,
+	}
+	var err error
+	ConsulSingleton.consulAgent,err = consulapi.NewClient(consulapi.DefaultConfig())
+    if err!=nil {
+		logrus.Error("init consul error,error is " + err.Error())
+		os.Exit(1)
+	}
+	go ConsulSingleton.Register()
+    go ConsulSingleton.handleContext()
+}
+
+func (c *Consul) handleContext(){
+	config.WaitGroup.Add(1)
+	defer config.WaitGroup.Done()
+	for{
+		select {
+		    case <-c.ctx.Done():
+		    	logrus.Error("consul deregister")
+		    	c.Deregister()
+		    	return
+		}
+	}
+}
+
+func (c *Consul) Register(){
+    var err error
+    instance:=&consulapi.AgentServiceRegistration{
+    	ID:config.Config.Consul.AppName,
+    	Name:config.Config.Consul.AppName,
+    	Port:8090,
+    	Address:config.Config.Consul.AppAddr,
+    	Tags: []string{"instance_node"},
+    	Check: &consulapi.AgentServiceCheck{
+    		HTTP: fmt.Sprintf("http://%s:%d/%s",config.Config.Server.Host,config.Config.Server.Port,config.Config.Consul.HealthCheckUri),
+    		Timeout: "5s",
+    		Interval: "5s",
+    		DeregisterCriticalServiceAfter: "60s",//check failed,then wait 60 seconds to remove instance
+		},
+	}
+	err = c.consulAgent.Agent().ServiceRegister(instance)
+	if err!=nil{
+		logrus.Error("register instance failed,error is "+err.Error())
+	}
+}
+
+func (c *Consul) Deregister(){
+	var i = 0
+	for i< 10{
+		err:=c.consulAgent.Agent().ServiceDeregister(config.Config.Consul.AppName)
+		if err !=nil {
+			logrus.Error("deregister failed ,error is "+err.Error())
+			i++
+		}else{
+			break
+		}
+	}
+}
+
+func (c *Consul) Random(sName string) *consulapi.AgentService{
+	options:=&consulapi.QueryOptions{
+		WaitTime: time.Duration(4000)*time.Millisecond,
+	}
+	instance,_,err :=c.consulAgent.Agent().Service(sName,options)
+	if err != nil {
+		logrus.Error("fetch consul service failed,error is "+err.Error())
+	}
+	return instance
+}
+

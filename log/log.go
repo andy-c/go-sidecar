@@ -10,13 +10,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"go-sidecar/config"
 	"go-sidecar/log/hooks"
-	"os"
+	"io"
 	"strings"
 	"time"
 )
 
 func InitLogger(){
-	logrus.SetOutput(os.Stdout)
+	logrus.SetOutput(io.Discard)
 	logrus.SetLevel(getLogLevel(config.Config.Log.Level))
 	logrus.SetReportCaller(true)
 	if config.Config.Log.Format == "json" {
