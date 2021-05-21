@@ -599,3 +599,13 @@ func (c *Consul) Random(sName string) *consulapi.AgentService{
 	return instance
 }
 
+func (c *Consul) Instances(){
+	//to do list
+	//for consul we dont pull all the apps
+}
+
+func (c *Consul) HeartBeat(){
+	//nothing to do
+	//for consul we dont send the heartbeat packet
+}
+
