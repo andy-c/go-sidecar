@@ -2,7 +2,7 @@
  
 ## 简介
 
-go-sidecar go 实现的sidecar模型,服务治理基于springcloud的eureka,配置管理使用协程apollo,来服务内侧的应用
+go-sidecar go 实现的sidecar模型,服务治理基于springcloud的eureka或者consul,配置管理使用协程apollo,来服务内侧的应用
 
 ## 功能
 
